@@ -1,31 +1,36 @@
 import Carrinho from 'pages/Carrinho';
 import Feira from 'pages/Feira';
 import Login from 'pages/Login';
-import { useState } from 'react';
-import {BrowserRouter, Switch, Route} from 'react-router-dom';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { UsuarioProvider } from 'common/context/Usuario';
+import { CarrinhoProvider } from 'common/context/Carrinho';
+import { PagamentoProvider } from 'common/context/Pagamento';
 
 const Router = () => {
-    
-    return ( 
+
+    return (
         <BrowserRouter>
             <Switch>
-                <Route exact path='/'>
-                    <UsuarioProvider>
-                        <Login/>
-                    </UsuarioProvider>
-                </Route>
+                <UsuarioProvider>
+                    <Route exact path='/'>
+                        <Login />
+                    </Route>
+                    <CarrinhoProvider>
+                        <Route path='/feira'>
+                            <Feira />
+                        </Route>
+                        <PagamentoProvider>
+                            <Route path='/carrinho'>
+                                <Carrinho />
+                            </Route>
+                        </PagamentoProvider>
+                    </CarrinhoProvider>
+                </UsuarioProvider>
+                
 
-                <Route path='/feira'>
-                    <Feira />
-
-                    <Route path='/carrinho'>
-                    <Carrinho/>
-                </Route>
-                </Route>
             </Switch>
         </BrowserRouter>
-     );
+    );
 }
- 
+
 export default Router;
