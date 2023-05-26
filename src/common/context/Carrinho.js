@@ -1,5 +1,7 @@
 import { IndeterminateCheckBoxRounded } from '@material-ui/icons';
 import {createContext, useContext, useEffect, useState} from 'react';
+import { usePagamentoContext } from './Pagamento';
+import { UsuarioContext } from './Usuario';
 
 export const CarrinhoContext = createContext();
 
@@ -18,6 +20,14 @@ export const CarrinhoProvider = ({children}) => {
 
 export const useCarrinhoContext = () => {
     const { carrinho, setCarrinho, quantidadeProdutos, setQuantidadeProdutos, valorTotalCarrinho, setValorTotalCarrinho} = useContext(CarrinhoContext);
+
+    const{
+        formaPagamento,
+    } = usePagamentoContext();
+
+    const {
+        setSaldo
+    } = useContext(UsuarioContext)
 
     function mudaQuantidade(id, quantidade) {
         return carrinho.map(itemDoCarrinho => {
@@ -45,6 +55,11 @@ export const useCarrinhoContext = () => {
             setCarrinho(mudaQuantidade(id, -1))
         }
 
+        function efetuarCompra() {
+            setCarrinho([]);
+            setSaldo(saldoAtual => saldoAtual - valorTotalCarrinho)
+        }
+
         useEffect(()=> {
             const {novoTotal, novaQuantidade} = carrinho.reduce((contador, produto) => ({
                 novaQuantidade: contador.novaQuantidade + produto.quantidade,
@@ -54,8 +69,8 @@ export const useCarrinhoContext = () => {
                 novoTotal: 0
             });
             setQuantidadeProdutos(novaQuantidade);
-            setValorTotalCarrinho(novoTotal)
-        }, [carrinho, setQuantidadeProdutos, setValorTotalCarrinho]);
+            setValorTotalCarrinho(novoTotal * formaPagamento.juros)
+        }, [carrinho, setQuantidadeProdutos, setValorTotalCarrinho, formaPagamento]);
 
     return {
         carrinho, 
@@ -64,7 +79,8 @@ export const useCarrinhoContext = () => {
         removerProd,
         quantidadeProdutos,
         setQuantidadeProdutos,
-        valorTotalCarrinho
+        valorTotalCarrinho, 
+        efetuarCompra
     }
 
 
